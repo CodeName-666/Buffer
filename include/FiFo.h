@@ -9,11 +9,11 @@
 #ifndef FIFO_H_
 #define FIFO_H_
 
-#include "Arduino.h"
+#include "stdint.h"
 
 
-#define FIFOTEMPLATE_N_OK                        0
-#define FIFOTEMPLATE_OK                          1
+#define FIFO_N_OK                        0
+#define FIFO_OK                          1
 
 typedef uint8_t FIFO_Return_t;
 
@@ -23,95 +23,94 @@ typedef uint8_t FIFO_Return_t;
 /**
  *
  */
-#define FIFOTEMPLATE_IS_BUFFER_READY(bufPtr)                            \
+#define FIFO_IS_BUFFER_READY(bufPtr)                            \
           ((bufPtr.status == FIFO_BUFFER_EMPTY) ||                       \
            (bufPtr.status == FIFO_BUFFER_DATA_AVAILABLE) ||              \
            (bufPtr.status == FIFO_BUFFER_FULL))
 /**
  *
  */
-#define FIFOTEMPLATE_HAS_BUFFER_ERRORS(bufPtr)                           \
+#define FIFO_HAS_BUFFER_ERRORS(bufPtr)                           \
         ((bufPtr.status == FIFO_WRITE_OVERFLOW_ERROR) ||        \
          (bufPtr.status == FIFO_UNDEF_ERROR))
 /**
  *
  */
-#define FIFOTEMPLATE_IS_BUFFER_FULL(bufPtr)                             \
+#define FIFO_IS_BUFFER_FULL(bufPtr)                             \
         (bufPtr.status == FIFO_BUFFER_FULL)
 
 /**
  *
  */
-#define FIFOTEMPLATE_IS_BUFFER_EMPTY(bufPtr)                            \
+#define FIFO_IS_BUFFER_EMPTY(bufPtr)                            \
         (bufPtr.status == FIFO_BUFFER_EMPTY)
 
 /**
  *
  */
-#define FIFOTEMPLATE_GET_WRITE_COUNT(bufPtr)               \
+#define FIFO_GET_WRITE_COUNT(bufPtr)               \
       (bufPtr.counter.write)
 
 /**
  *
  */
-#define FIFOTEMPLATE_GET_READ_COUNT(bufPtr)                \
+#define FIFO_GET_READ_COUNT(bufPtr)                \
       (bufPtr.counter.read)
 
 /**
  *
  */
-#define FIFOTEMPLATE_GET_BUFFER_SIZE(bufPtr)               \
+#define FIFO_GET_BUFFER_SIZE(bufPtr)               \
       (bufPtr.bufferSize)
 
 /**
  *
  */
-#define FIFOTEMPLATE_SET_WRITE_BUFFER(bufPtr,val)          \
+#define FIFO_SET_WRITE_BUFFER(bufPtr,val)          \
       (bufPtr.counter.write = val)
 
 /**
  *
  */
-#define FIFOTEMPLATE_SET_READ_BUFFER(bufPtr,val)           \
+#define FIFO_SET_READ_BUFFER(bufPtr,val)           \
       (bufPtr.counter.read = val)
 
 /**
  *
  */
-#define FIFOTEMPLATE_READ(bufPtr,index)         \
+#define FIFO_READ(bufPtr,index)         \
       (bufPtr.bufferPtr[index])
 
 /**
  *
  */
-#define FIFOTEMPLATE_WRITE(bufPtr,index, param)   \
+#define FIFO_WRITE(bufPtr,index, param)   \
       (bufPtr.bufferPtr[index] = param)
 
 /**
  *
  */
-#define FIFOTEMPLATE_GET_OVERFLOW_STATUS(bufPtr)           \
+#define FIFO_GET_OVERFLOW_STATUS(bufPtr)           \
         (bufPtr.counter.overflow)
 /**
  *
  */
-#define FIFOTEMPLATE_SET_OVERFLOW_STATUS(bufPtr, stat)     \
+#define FIFO_SET_OVERFLOW_STATUS(bufPtr, stat)     \
         (bufPtr.counter.overflow = stat)
 /**
  *
  */
-#define FIFOTEMPLATE_SET_BUFFER_STATUS(bufPtr, stat)       \
+#define FIFO_SET_BUFFER_STATUS(bufPtr, stat)       \
         (bufPtr.status = stat)
 /**
  *
  */
-#define FIFOTEMPLATE_GET_BUFFER_STATUS(bufPtr)             \
+#define FIFO_GET_BUFFER_STATUS(bufPtr)             \
         (bufPtr.status)
 
 
 
-template<typename FiFoType>
-class FiFo
+template<typename FiFoType> class FiFo
 {
 
    public:
@@ -253,7 +252,7 @@ class FiFo
       uint16_t getSizeOfBuffer(void);
 
    private:
-      FIFO_Buffer_t _buffer;
+      FIFO_Buffer_t m_buffer;
 };
 
 /**************************************************************************************************
@@ -261,12 +260,12 @@ class FiFo
  *************************************************************************************************/
 template<typename FiFoType> inline FiFo<FiFoType>::FiFo()
 {
-   this->_buffer.bufferPtr = NULL;
-   this->_buffer.bufferSize = 0;
-   this->_buffer.counter.overflow = false;
-   this->_buffer.counter.read = 0u;
-   this->_buffer.counter.write = 0u;
-   this->_buffer.status = FIFO_NO_INIT;
+   m_buffer.bufferPtr = NULL;
+   m_buffer.bufferSize = 0;
+   m_buffer.counter.overflow = false;
+   m_buffer.counter.read = 0u;
+   m_buffer.counter.write = 0u;
+   m_buffer.status = FIFO_NO_INIT;
 
 }
 
@@ -278,16 +277,16 @@ template<typename FiFoType> inline void FiFo<FiFoType>::initBuffer(uint8_t *avBu
 {
    if (avBuffer != NULL)
    {
-      this->_buffer.bufferPtr = avBuffer;
-      this->_buffer.bufferSize = avSize;
-      this->_buffer.status = FIFO_BUFFER_EMPTY;
-      this->_buffer.counter.overflow = false;
-      this->_buffer.counter.read = 0u;
-      this->_buffer.counter.write = 0u;
+      m_buffer.bufferPtr = avBuffer;
+      m_buffer.bufferSize = avSize;
+      m_buffer.status = FIFO_BUFFER_EMPTY;
+      m_buffer.counter.overflow = false;
+      m_buffer.counter.read = 0u;
+      m_buffer.counter.write = 0u;
    }
    else
    {
-      this->_buffer.bufferPtr = NULL;
+      m_buffer.bufferPtr = NULL;
    }
    return;
 }
@@ -302,15 +301,15 @@ template<typename FiFoType> inline bool FiFo<FiFoType>::write(FiFoType* p)
    bool status = false;
    uint8_t* data;
 
-   if (FIFOTEMPLATE_IS_BUFFER_READY(this->_buffer) == true)
+   if (FIFO_IS_BUFFER_READY(m_buffer) == true)
    {
       data = (uint8_t*) p;
       for (count = 0; count < sizeof(FiFoType); count++)
       {
-         i = FIFOTEMPLATE_GET_WRITE_COUNT(this->_buffer);
-         FIFOTEMPLATE_WRITE(this->_buffer, i, data[count]);
-         this->incrementWriteCounter();
-         this->updateBufferStatus();
+         i = FIFO_GET_WRITE_COUNT(m_buffer);
+         FIFO_WRITE(m_buffer, i, data[count]);
+         incrementWriteCounter();
+         updateBufferStatus();
       }
 
       status = true;
@@ -329,7 +328,7 @@ template<typename FiFoType> inline bool FiFo<FiFoType>::write(FiFoType* p, uint1
    bool status = false;
    uint8_t* data;
 
-   if (FIFOTEMPLATE_IS_BUFFER_READY(this->_buffer) == true)
+   if (FIFO_IS_BUFFER_READY(m_buffer) == true)
    {
 	  data = (uint8_t*) p;
 
@@ -338,10 +337,10 @@ template<typename FiFoType> inline bool FiFo<FiFoType>::write(FiFoType* p, uint1
 	  for (count = 0; count < (typeSize * length); count++)
 	  {
 		 Serial.print((char)data[count]);
-		 i = FIFOTEMPLATE_GET_WRITE_COUNT(this->_buffer);
-		 FIFOTEMPLATE_WRITE(this->_buffer, i, data[count]);
-		 this->incrementWriteCounter();
-		 this->updateBufferStatus();
+		 i = FIFO_GET_WRITE_COUNT(m_buffer);
+		 FIFO_WRITE(m_buffer, i, data[count]);
+		 incrementWriteCounter();
+		 updateBufferStatus();
 	  }
 
 	  status = true;
@@ -359,15 +358,15 @@ template<typename FiFoType> inline FiFoType FiFo<FiFoType>::read(void)
    FiFoType* ret = NULL;
    uint16_t i;
    uint8_t count;
-   if (FIFOTEMPLATE_IS_BUFFER_READY(this->_buffer) == true &&
-   FIFOTEMPLATE_IS_BUFFER_EMPTY(this->_buffer) == false)
+   if (FIFO_IS_BUFFER_READY(m_buffer) == true &&
+   FIFO_IS_BUFFER_EMPTY(m_buffer) == false)
    {
       for (count = 0; count < sizeof(FiFoType); count++)
       {
-         i = FIFOTEMPLATE_GET_READ_COUNT(this->_buffer);
-         p[count] = FIFOTEMPLATE_READ(this->_buffer, i);
-         this->incrementReadCounter();
-         this->updateBufferStatus();
+         i = FIFO_GET_READ_COUNT(m_buffer);
+         p[count] = FIFO_READ(m_buffer, i);
+         incrementReadCounter();
+         updateBufferStatus();
       }
    }
 
@@ -382,14 +381,14 @@ template<typename FiFoType> inline void FiFo<FiFoType>::incrementWriteCounter(vo
 {
    uint8_t size;
 
-   size = FIFOTEMPLATE_GET_WRITE_COUNT(this->_buffer) + 1;
-   if(size > FIFOTEMPLATE_GET_BUFFER_SIZE(this->_buffer))
+   size = FIFO_GET_WRITE_COUNT(m_buffer) + 1;
+   if(size > FIFO_GET_BUFFER_SIZE(m_buffer))
    {
       size = 0;
-      FIFOTEMPLATE_SET_OVERFLOW_STATUS(this->_buffer, true);
+      FIFO_SET_OVERFLOW_STATUS(m_buffer, true);
    }
 
-   FIFOTEMPLATE_SET_WRITE_BUFFER(this->_buffer, size);
+   FIFO_SET_WRITE_BUFFER(m_buffer, size);
    return;
 }
 
@@ -400,14 +399,14 @@ template<typename FiFoType> inline void FiFo<FiFoType>::incrementReadCounter(voi
 {
    uint8_t size;
 
-   size = FIFOTEMPLATE_GET_READ_COUNT(this->_buffer) + 1;
-   if(size > FIFOTEMPLATE_GET_BUFFER_SIZE(this->_buffer))
+   size = FIFO_GET_READ_COUNT(m_buffer) + 1;
+   if(size > FIFO_GET_BUFFER_SIZE(m_buffer))
    {
       size = 0;
-      FIFOTEMPLATE_SET_OVERFLOW_STATUS(this->_buffer, false);
+      FIFO_SET_OVERFLOW_STATUS(m_buffer, false);
    }
 
-   FIFOTEMPLATE_SET_READ_BUFFER(this->_buffer, size);
+   FIFO_SET_READ_BUFFER(m_buffer, size);
    return;
 }
 
@@ -440,38 +439,38 @@ template<typename FiFoType> inline void FiFo<FiFoType>::updateBufferStatus(void)
     ************************************************************************/
    boolean o;
    uint8_t w, r;
-   w = FIFOTEMPLATE_GET_WRITE_COUNT(this->_buffer);
-   r = FIFOTEMPLATE_GET_READ_COUNT(this->_buffer);
-   o = (boolean) FIFOTEMPLATE_GET_OVERFLOW_STATUS(this->_buffer);
+   w = FIFO_GET_WRITE_COUNT(m_buffer);
+   r = FIFO_GET_READ_COUNT(m_buffer);
+   o = (boolean) FIFO_GET_OVERFLOW_STATUS(m_buffer);
 
    if (o == false)
    {
       if (w > r)
       {
-         FIFOTEMPLATE_SET_BUFFER_STATUS(this->_buffer, FIFO_BUFFER_DATA_AVAILABLE);
+         FIFO_SET_BUFFER_STATUS(m_buffer, FIFO_BUFFER_DATA_AVAILABLE);
       }
       else if (w == r)
       {
-         FIFOTEMPLATE_SET_BUFFER_STATUS(this->_buffer, FIFO_BUFFER_EMPTY);
+         FIFO_SET_BUFFER_STATUS(m_buffer, FIFO_BUFFER_EMPTY);
       }
       else
       {
-         FIFOTEMPLATE_SET_BUFFER_STATUS(this->_buffer, FIFO_UNDEF_ERROR);
+         FIFO_SET_BUFFER_STATUS(m_buffer, FIFO_UNDEF_ERROR);
       }
    }
    else
    {
       if (w > r)
       {
-         FIFOTEMPLATE_SET_BUFFER_STATUS(this->_buffer, FIFO_WRITE_OVERFLOW_ERROR);
+         FIFO_SET_BUFFER_STATUS(m_buffer, FIFO_WRITE_OVERFLOW_ERROR);
       }
       else if (w == r)
       {
-         FIFOTEMPLATE_SET_BUFFER_STATUS(this->_buffer, FIFO_BUFFER_FULL);
+         FIFO_SET_BUFFER_STATUS(m_buffer, FIFO_BUFFER_FULL);
       }
       else
       {
-         FIFOTEMPLATE_SET_BUFFER_STATUS(this->_buffer, FIFO_BUFFER_DATA_AVAILABLE);
+         FIFO_SET_BUFFER_STATUS(m_buffer, FIFO_BUFFER_DATA_AVAILABLE);
       }
    }
    return;
@@ -482,7 +481,7 @@ template<typename FiFoType> inline void FiFo<FiFoType>::updateBufferStatus(void)
  *************************************************************************************************/
 template<typename FiFoType> inline uint16_t FiFo<FiFoType>::getBufferStatus(void)
 {
-   return FIFOTEMPLATE_GET_BUFFER_STATUS(this->_buffer);
+   return FIFO_GET_BUFFER_STATUS(m_buffer);
 }
 
 /**************************************************************************************************
@@ -493,17 +492,17 @@ template<typename FiFoType> inline uint16_t FiFo<FiFoType>::getFreeBufferSpace(v
    boolean o;
    uint8_t w, r;
    uint16_t space = 0;
-   w = FIFOTEMPLATE_GET_WRITE_COUNT(this->_buffer);
-   r = FIFOTEMPLATE_GET_READ_COUNT(this->_buffer);
-   o = (boolean) FIFOTEMPLATE_GET_OVERFLOW_STATUS(this->_buffer);
+   w = FIFO_GET_WRITE_COUNT(m_buffer);
+   r = FIFO_GET_READ_COUNT(m_buffer);
+   o = (boolean) FIFO_GET_OVERFLOW_STATUS(m_buffer);
 
    if (o == true)
    {
-      space = FIFOTEMPLATE_GET_BUFFER_SIZE(this->_buffer) - (r - w);
+      space = FIFO_GET_BUFFER_SIZE(m_buffer) - (r - w);
    }
    else
    {
-      space = FIFOTEMPLATE_GET_BUFFER_SIZE(this->_buffer) - (w - r);
+      space = FIFO_GET_BUFFER_SIZE(m_buffer) - (w - r);
    }
    return space;
 }
@@ -516,8 +515,8 @@ inline bool FiFo<FiFoType>::dataAvailable(void)
 {
    bool ret = false;
 
-   if (FIFOTEMPLATE_IS_BUFFER_READY(this->_buffer) == true &&
-   FIFOTEMPLATE_IS_BUFFER_EMPTY(this->_buffer) == false)
+   if (FIFO_IS_BUFFER_READY(m_buffer) == true &&
+   FIFO_IS_BUFFER_EMPTY(m_buffer) == false)
    {
       ret = true;
    }
@@ -528,7 +527,7 @@ inline bool FiFo<FiFoType>::dataAvailable(void)
 
 template<typename FiFoType> inline uint16_t FiFo<FiFoType>::getSizeOfBuffer(void)
 {
-	return FIFOTEMPLATE_GET_BUFFER_SIZE(this->_buffer);
+	return FIFO_GET_BUFFER_SIZE(m_buffer);
 }
 
 template<typename FiFoType> inline uint16_t FiFo<FiFoType>::getUsedBufferSize(void)

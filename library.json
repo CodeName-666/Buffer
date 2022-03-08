@@ -1,0 +1,22 @@
+{
+  "name": "Buffer",
+  "version": "1.0.0",
+  "description": "Small library with template based FIFO and Ringbuffer",
+  "keywords": "Fifo Buffer, Ringbuffer",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/CodeName-666/StreamCom.git"
+  },
+  "authors":
+  [
+    {
+      "name": "Christof Seidel",
+      "email": "SeidC2221@gmail.com",
+      "maintainer": true
+    }
+  ],
+  "license": "MIT",
+  "frameworks": "*",
+  "platforms": "*"
+}
