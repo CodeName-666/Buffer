@@ -19,10 +19,11 @@ template <class T> class RingBuffer {
          * @param start_index 
          * @param direction 
          */
-        explicit RingBuffer(uint16_t size_of_buffer, uint16_t start_index = 0, Direction_e direction = DIR_FORWARD) :
-                                        m_current_idx(start_index),
-                                        m_buffer_size(size_of_buffer),
-                                        m_direction(direction)
+        explicit RingBuffer(uint16_t size_of_buffer, 
+                            uint16_t start_index = 0, 
+                            Direction_e direction = DIR_FORWARD) : m_current_idx(start_index),
+                                                                   m_buffer_size(size_of_buffer),
+                                                                   m_direction(direction)
                                         
         {
             m_buffer_data = new T[size_of_buffer];

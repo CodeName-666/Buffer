@@ -107,6 +107,48 @@ typedef uint8_t FIFO_Return_t;
  */
 #define FIFO_GET_BUFFER_STATUS(bufPtr)             \
         (bufPtr.status)
+/**
+ * @brief Buffer Status
+ *
+ * Status values which the FIFO can contains.
+ */
+enum FIFO_BufferStatus_e
+{
+   FIFO_BUFFER_EMPTY = 0x00,
+   FIFO_BUFFER_DATA_AVAILABLE,
+   FIFO_BUFFER_FULL,
+   FIFO_WRITE_OVERFLOW_ERROR,
+   FIFO_UNDEF_ERROR,
+   FIFO_NO_INIT,
+};
+
+/**
+ * @brief FiFo Counter
+ *
+ * Structure which contains all needed counter parameter to handle the
+ * FIFO Buffer. This counter represents the read/write position.
+ * To calculate the correct position, the overflow parameter is needed.
+ */
+typedef struct
+{
+   uint16_t read;
+   uint16_t write;
+   bool overflow;
+   
+} FIFO_Counter_t;
+
+/**
+ * @brief Buffer Structure
+ *
+ * This struct represents a FIFO Buffer.
+ */
+typedef struct
+{
+   uint8_t *bufferPtr;
+   uint16_t bufferSize;
+   FIFO_BufferStatus_e status;
+   FIFO_Counter_t counter;
+} FIFO_Buffer_t;
 
 
 
@@ -114,47 +156,8 @@ template<typename FiFoType> class FiFo
 {
 
    public:
-      /**
-       * @brief Buffer Status
-       *
-       * Status values which the FIFO can contains.
-       */
-      enum FIFO_BufferStatus_t
-      {
-         FIFO_BUFFER_EMPTY = 0x00,
-         FIFO_BUFFER_DATA_AVAILABLE,
-         FIFO_BUFFER_FULL,
-         FIFO_WRITE_OVERFLOW_ERROR,
-         FIFO_UNDEF_ERROR,
-         FIFO_NO_INIT,
-      };
+    
 
-      /**
-       * @brief FiFo Counter
-       *
-       * Structure which contains all needed counter parameter to handle the
-       * FIFO Buffer. This counter represents the read/write position.
-       * To calculate the correct position, the overflow parameter is needed.
-       */
-      typedef struct
-      {
-            uint16_t read;
-            uint16_t write;
-            boolean overflow;
-      } FIFO_Counter_t;
-
-      /**
-       * @brief Buffer Structure
-       *
-       * This struct represents a FIFO Buffer.
-       */
-      typedef struct
-      {
-            uint8_t *bufferPtr;
-            uint16_t bufferSize;
-            FIFO_BufferStatus_t status;
-            FIFO_Counter_t counter;
-      } FIFO_Buffer_t;
 
    protected:
 
@@ -477,7 +480,7 @@ template<typename FiFoType> inline void FiFo<FiFoType>::updateBufferStatus(void)
 }
 
 /**************************************************************************************************
- * FUNCTION: FIFO_BufferStatus_t FIFO_GetBufferStatus(...)
+ * FUNCTION: FIFO_BufferStatus_e FIFO_GetBufferStatus(...)
  *************************************************************************************************/
 template<typename FiFoType> inline uint16_t FiFo<FiFoType>::getBufferStatus(void)
 {
