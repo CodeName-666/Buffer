@@ -44,6 +44,7 @@ public:
      */
     bool isNext(void) {return m_next != NULL ? true: false;}
 
+    void reset_next(void) {m_next = NULL;}
 private:
     T m_data;
     ListEntry<T>* m_next;
@@ -88,12 +89,19 @@ public:
          */
         void insert(uint16_t pos,ListEntry<T>& entry)
         {
-            ListEntry<T>* e = index(pos);
-            ListEntry<T>* current_next = e->next();
+            if(pos < m_list_size)
+            {
+                ListEntry<T>* e = at_index(pos);
+                ListEntry<T>* current_next = e->next();
 
-            e->next(entry);
-            entry.next(current_next);
-            m_list_size++;
+                e->next(entry);
+                entry.next(current_next);
+                m_list_size++;
+            }
+            else
+            {
+                push_back(entry);
+            }
 
             return;
         }
@@ -102,8 +110,10 @@ public:
          * @brief clear
          */
         void clear(void){
-            m_list_data = NULL;
-            m_list_size = 0;
+            for(uint16_t i = m_list_size-1; i >= 0; i--)
+            {
+                erase(i);
+            }
             return;
         }
 
@@ -113,11 +123,26 @@ public:
          */
         void erase(uint16_t pos)
         {
-            ListEntry<T>* ref_enty = index(pos - 1);
-            ListEntry<T>* pos_entry = ref_enty->next();
-            ListEntry<T>* after_entry = pos_entry->next();
+            ListEntry<T>* ref_enty, *pos_entry,*after_entry;
 
-            ref_enty->next(after_entry);
+            if(pos > 0)
+            {
+                //Get entry on at POS
+                pos_entry = at_index(pos);
+                //Get entry before POS
+                ref_enty = at_index(pos - 1);
+                //Get entry after POS
+                after_entry = at_index(pos + 1);
+                //Reset next pointer from entry at pos
+                pos_entry->reset_next();
+                //Switch position which mean, obj is deleted.
+                ref_enty->next(*after_entry);
+            }
+            else
+            {
+                pos_entry = at_index(pos);
+                pos_entry->reset_next();
+            }
             m_list_size--;
             return;
         }
@@ -128,10 +153,13 @@ public:
          */
         void push_front(ListEntry<T>& entry)
         {
-            ListEntry<T>* e = m_list_data->isNext();
-            m_list_data = &entry;
-            m_list_data->next(e);
-            m_list_size++;
+            if(!available(entry))
+            {
+                ListEntry<T>* e = m_list_data;
+                m_list_data = &entry;
+                m_list_data->next(*e);
+                m_list_size++;
+            }
             return;
         }
 
@@ -147,8 +175,11 @@ public:
            }
            else
            {
-               ListEntry<T>* e  = last();
-               e->next(entry);
+                if(!available(entry))
+                {
+                    ListEntry<T>* e  = last();
+                    e->next(entry);
+                }
            }
            m_list_size++;
            return;
@@ -166,7 +197,7 @@ public:
          * @return
          */
         T* at(uint16_t pos) {
-            ListEntry<T>* entry = index(pos);
+            ListEntry<T>* entry = at_index(pos);
             return entry->data();
         };
 
@@ -180,16 +211,31 @@ public:
             return entry;
         }
 
-        ListEntry<T>* index(uint16_t pos) {
+        ListEntry<T>* at_index(uint16_t pos) {
             ListEntry<T>* entry = m_list_data;
-            for(uint16_t i = 0; (i < pos && pos < m_list_data && entry->isNext()); i++)
+            ListEntry<T>* ret = NULL;
+            for(uint16_t i = 0; (i < pos && pos < m_list_size && entry->isNext()); i++)
             {
                 entry = entry->next();
             }
-
-            return entry;
+            ret = entry;
+            return ret;
         }
 
+        bool available(ListEntry<T>& entry)
+        {
+            bool exist = false;
+            ListEntry<T>* e = m_list_data;
+            for(uint16_t i = 0; (i < m_list_size && e->isNext() && exist == false) ; i++)
+            {
+                e = e->next();
+                if(e == &entry)
+                {
+                    exist = true;
+                }
+            }
+            return exist;
+        }
 
 
     private:
