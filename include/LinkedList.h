@@ -153,7 +153,7 @@ public:
          */
         void push_front(ListEntry<T>& entry)
         {
-            if(!available(entry))
+            if(!exists(entry))
             {
                 ListEntry<T>* e = m_list_data;
                 m_list_data = &entry;
@@ -175,7 +175,7 @@ public:
            }
            else
            {
-                if(!available(entry))
+                if(!exists(entry))
                 {
                     ListEntry<T>* e  = last();
                     e->next(entry);
@@ -201,6 +201,20 @@ public:
             return entry->data();
         };
 
+        bool exists(ListEntry<T>& entry)
+        {
+            bool exist = false;
+            ListEntry<T>* e = m_list_data;
+            for(uint16_t i = 0; (i < m_list_size && e->isNext() && exist == false) ; i++)
+            {
+                e = e->next();
+                if(e == &entry)
+                {
+                    exist = true;
+                }
+            }
+            return exist;
+        }
     private:
         ListEntry<T>* last(void) {
             ListEntry<T>* entry = m_list_data;
@@ -221,22 +235,6 @@ public:
             ret = entry;
             return ret;
         }
-
-        bool available(ListEntry<T>& entry)
-        {
-            bool exist = false;
-            ListEntry<T>* e = m_list_data;
-            for(uint16_t i = 0; (i < m_list_size && e->isNext() && exist == false) ; i++)
-            {
-                e = e->next();
-                if(e == &entry)
-                {
-                    exist = true;
-                }
-            }
-            return exist;
-        }
-
 
     private:
         ListEntry<T>* m_list_data;
