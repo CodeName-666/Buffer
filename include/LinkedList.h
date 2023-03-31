@@ -162,6 +162,29 @@ public:
         return;
     }
 
+    uint16_t next(ListEntry<T>* entry) 
+    {
+        static uint16_t entry_count = 0;
+        ListEntry<T>* entry 
+        if(m_last_active_entry->isNext())
+        {
+            entry = m_last_active_entry->next();
+            m_last_active_entry = entry;
+        }
+        else 
+        {
+            entry = NULL
+        }
+       
+        return m_last_active_entry;
+    }
+
+    void reset(void) 
+    {
+        m_last_active_entry = at_index(0);
+
+    } 
+
     /**
      * @brief push_back
      * @param entry
@@ -241,7 +264,9 @@ private:
 
 private:
     ListEntry<T> *m_list_data;
+    ListEntry<T> *m_last_active_entry;
     uint16_t m_list_size;
+
 };
 
 #endif
