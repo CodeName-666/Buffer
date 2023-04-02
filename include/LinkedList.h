@@ -1,8 +1,8 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
-#include <iostream>
-#include <stdio.h>
+
+#include <stdint.h>
 
 /**
  * @brief The ListEntry class
@@ -165,16 +165,17 @@ public:
     uint16_t next(ListEntry<T>* entry) 
     {
         static uint16_t entry_count = 0;
-        ListEntry<T>* entry 
-        if(m_last_active_entry->isNext())
+        if(m_last_active_entry != NULL && m_last_active_entry->isNext())
         {
-            entry = m_last_active_entry->next();
-            m_last_active_entry = entry;
+            m_last_active_entry = m_last_active_entry->next();
+            entry_count++;           
         }
         else 
         {
-            entry = NULL
+            m_last_active_entry = at_index(0);
+            entry_count = 0;
         }
+        *entry = *m_last_active_entry;
        
         return m_last_active_entry;
     }
