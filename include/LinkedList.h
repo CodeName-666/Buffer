@@ -12,7 +12,7 @@ class ListEntry
 {
 public:
     ListEntry() : m_next(NULL) {}
-    ListEntry(T &data) : m_data(&data), m_next(NULL) {}
+    //ListEntry(T &data) : m_data(&data), m_next(NULL) {}
     ListEntry(T data) : m_data(data), m_next(NULL) {}
 
     /**
