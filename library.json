@@ -3,13 +3,11 @@
   "version": "1.0.0",
   "description": "Small library with template based FIFO and Ringbuffer",
   "keywords": "Fifo Buffer, Ringbuffer",
-  "repository":
-  {
+  "repository": {
     "type": "git",
     "url": "https://SeidC@bitbucket.org/SeidC/plotter.git"
   },
-  "authors":
-  [
+  "authors": [
     {
       "name": "Christof Seidel",
       "email": "SeidC2221@gmail.com",
