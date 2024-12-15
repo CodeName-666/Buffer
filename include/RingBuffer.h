@@ -208,6 +208,13 @@ public:
      */
     uint16_t currentIdx(void) { return m_current_idx; }
 
+    /**
+     * @brief size
+     * @return
+     */
+    uint16_t size(void) { return m_list_size; }
+
+
 private:
     /**
      * @brief Update the current index by a specified offset.
